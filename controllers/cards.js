@@ -7,7 +7,7 @@ module.exports.getCards = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      res.status(500).send('Ошибка на стороне сервера');
+      res.status(500).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };
@@ -25,10 +25,10 @@ module.exports.createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send('Переданы некорректные данные карточки');
+        res.status(400).send({ message: 'Переданы некорректные данные карточки' });
         console.log(err.message);
       } else {
-        res.status(500).send('Ошибка на стороне сервера');
+        res.status(500).send({ message: 'Ошибка на стороне сервера' });
         console.log(err.message);
       }
     });
@@ -41,15 +41,15 @@ module.exports.deleteCard = (req, res, next) => {
       if (card) {
         if (card.owner.toString() === req.user._id.toString()) {
           Card.findByIdAndRemove(req.params.id)
-            .then(() => res.send('Карточка удалена'))
+            .then(() => res.send({ message: 'Карточка удалена' }))
             .catch(() => next());
         } else {
-          next(res.send('Удаление возможно только владельцем карточки'));
+          next(res.send({ message: 'Удаление возможно только владельцем карточки' }));
         }
       }
     })
     .catch((err) => {
-      res.status(500).send('Ошибка на стороне сервера');
+      res.status(500).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };
@@ -64,11 +64,11 @@ module.exports.likeCard = (req, res, next) => {
       if (card) {
         res.send(card);
       } else {
-        next(res.status(404).send(`Карточка с id: ${req.params.id} не найдена`));
+        next(res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` }));
       }
     })
     .catch((err) => {
-      res.status(500).send('Ошибка на стороне сервера');
+      res.status(500).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };
@@ -83,11 +83,11 @@ module.exports.dislikeCard = (req, res, next) => {
       if (card) {
         res.send(card);
       } else {
-        next(res.status(404).send(`Карточка с id: ${req.params.id} не найдена`));
+        next(res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` }));
       }
     })
     .catch((err) => {
-      res.status(500).send('Ошибка на стороне сервера');
+      res.status(500).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };
