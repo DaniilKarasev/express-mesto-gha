@@ -47,7 +47,7 @@ module.exports.deleteCard = (req, res, next) => {
           next(res.send({ message: 'Удаление возможно только владельцем карточки' }));
         }
       } else {
-        res.status(400).send({ message: 'Переданы некорректные данные карточки' });
+        next(res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` }));
       }
     })
     .catch((err) => {
