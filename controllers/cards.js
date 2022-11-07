@@ -49,7 +49,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
     })
     .catch((err) => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      res.status(400).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };
