@@ -11,7 +11,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   req.user = {
-    _id: '6368da2c10c1061daf2a68f7',
+    _id: '6367f8edc1dfb0d668dc21f7',
   };
 
   next();
@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 app.use('/cards', require('./routes/cards'));
 app.use('/users', require('./routes/users'));
 
-app.use('/*', (req, res, next) => { next(res.status(404).send({ message: 'Путь не найден' })); });
+app.use('/*', (req, res) => { res.status(404).send({ message: 'Путь не найден' }); });
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

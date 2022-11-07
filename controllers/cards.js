@@ -6,9 +6,8 @@ module.exports.getCards = (req, res) => {
     .then((card) => {
       res.send(card);
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
     });
 };
 
@@ -26,37 +25,37 @@ module.exports.createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные карточки' });
-        console.log(err.message);
       } else {
         res.status(500).send({ message: 'Ошибка на стороне сервера' });
-        console.log(err.message);
       }
     });
 };
 
-module.exports.deleteCard = (req, res, next) => {
+module.exports.deleteCard = (req, res) => {
   Card.findById(req.params.id)
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (card) {
         if (card.owner.toString() === req.user._id.toString()) {
           Card.findByIdAndRemove(req.params.id)
-            .then(() => res.send({ message: 'Карточка удалена' }))
-            .catch(() => next());
+            .then(() => res.send({ message: 'Карточка удалена' }));
         } else {
-          next(res.send({ message: 'Удаление возможно только владельцем карточки' }));
+          res.status(403).send({ message: 'Удаление возможно только владельцем карточки' });
         }
       } else {
-        next(res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` }));
+        res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` });
       }
     })
     .catch((err) => {
-      res.status(400).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Упс, что-то пошло не так!' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      }
     });
 };
 
-module.exports.likeCard = (req, res, next) => {
+module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -66,16 +65,19 @@ module.exports.likeCard = (req, res, next) => {
       if (card) {
         res.send(card);
       } else {
-        next(res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` }));
+        res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` });
       }
     })
     .catch((err) => {
-      res.status(400).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Упс, что-то пошло не так!' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      }
     });
 };
 
-module.exports.dislikeCard = (req, res, next) => {
+module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
@@ -85,11 +87,14 @@ module.exports.dislikeCard = (req, res, next) => {
       if (card) {
         res.send(card);
       } else {
-        next(res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` }));
+        res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` });
       }
     })
     .catch((err) => {
-      res.status(400).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Упс, что-то пошло не так!' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      }
     });
 };

@@ -6,23 +6,26 @@ module.exports.getUsers = (req, res) => {
     .then((users) => {
       res.send(users);
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
     });
 };
 
-module.exports.getUserById = (req, res, next) => {
+module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
       if (user) {
         res.send(user);
+      } else {
+        res.status(404).send({ message: `Пользователь по указанному c id: ${req.params.id} не найден` });
       }
-      next(res.status(404).send({ message: `Пользователь по указанному c id: ${req.params.id} не найден` }));
     })
     .catch((err) => {
-      res.status(400).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Упс, что-то пошло не так!' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      }
     });
 };
 
@@ -42,76 +45,58 @@ module.exports.createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные пользователя' });
-        console.log(err.message);
       } else {
         res.status(500).send({ message: 'Ошибка на стороне сервера' });
-        console.log(err.message);
       }
     });
 };
 
-module.exports.editUserProfile = (req, res, next) => {
+module.exports.editUserProfile = (req, res) => {
   const {
     name,
     about,
-    owner = req.user._id,
   } = req.body;
-  User.findById(owner)
-    .then((userFound) => {
-      if (!userFound) {
-        next(res.status(404).send({ message: `Пользователь по указанному c id: ${req.params.id} не найден` }));
+
+  User.findByIdAndUpdate(req.user._id, {
+    name,
+    about,
+  }, { new: true, runValidators: true })
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь по указанному c id: ${req.user._id} не найден` });
+      } else {
+        res.send(user);
       }
-      User.findByIdAndUpdate(owner, {
-        name,
-        about,
-      }, { new: true, runValidators: true })
-        .then((user) => {
-          res.send(user);
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            res.status(400).send({ message: 'Переданы некорректные данные пользователя' });
-            console.log(err.message);
-          } else {
-            res.status(500).send({ message: 'Ошибка на стороне сервера' });
-            console.log(err.message);
-          }
-        });
     })
     .catch((err) => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные пользователя' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      }
     });
 };
 
-module.exports.editUserAvatar = (req, res, next) => {
+module.exports.editUserAvatar = (req, res) => {
   const {
     avatar,
-    owner = req.user._id,
   } = req.body;
-  User.findById(owner)
-    .then((userFound) => {
-      if (!userFound) {
-        next(res.status(404).send({ message: `Пользователь по указанному c id: ${req.params.id} не найден` }));
+
+  User.findByIdAndUpdate(req.user._id, {
+    avatar,
+  }, { new: true, runValidators: true })
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: `Пользователь по указанному c id: ${req.user._id} не найден` });
+      } else {
+        res.send(user);
       }
-      User.findByIdAndUpdate(owner, {
-        avatar,
-      }, { new: true, runValidators: true })
-        .then((user) => {
-          res.send(user);
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            res.status(400).send({ message: 'Переданы некорректные данные пользователя' });
-            console.log(err.message);
-          } else {
-            res.status(500).send({ message: 'Ошибка на стороне сервера' });
-            console.log(err.message);
-          }
-        });
     })
     .catch((err) => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
-      console.log(err.message);
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные аватара' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      }
     });
 };
