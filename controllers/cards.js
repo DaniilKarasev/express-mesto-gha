@@ -68,7 +68,7 @@ module.exports.likeCard = (req, res, next) => {
       }
     })
     .catch((err) => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      res.status(400).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };
@@ -87,7 +87,7 @@ module.exports.dislikeCard = (req, res, next) => {
       }
     })
     .catch((err) => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      res.status(400).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };

@@ -21,7 +21,7 @@ module.exports.getUserById = (req, res, next) => {
       next(res.status(404).send({ message: `Пользователь по указанному c id: ${req.params.id} не найден` }));
     })
     .catch((err) => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
+      res.status(400).send({ message: 'Ошибка на стороне сервера' });
       console.log(err.message);
     });
 };
