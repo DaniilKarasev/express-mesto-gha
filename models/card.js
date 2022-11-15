@@ -31,7 +31,7 @@ const cardSchema = mongoose.Schema({
 });
 
 const linkValidator = function (value) {
-  linkValidation.test(value);
+  return linkValidation.test(value);
 };
 
 cardSchema.path('link').validate(linkValidator, 'error');
