@@ -1,17 +1,21 @@
 /* eslint-disable no-console */
 const Card = require('../models/card');
+const {
+  ServerError,
+  NotFoundError,
+  CastError,
+  ForbiddenError,
+} = require('../utils/errors');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((card) => {
       res.send(card);
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
-    });
+    .catch(() => next(new ServerError('Ошибка на стороне сервера')));
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const {
     name,
     link,
@@ -24,14 +28,14 @@ module.exports.createCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные карточки' });
+        next(new CastError(`Переданы некорректные данные при обновлении профиля. Поле${err.message.replace('card validation failed:', '').replace(':', '')}`));
       } else {
-        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.id)
     // eslint-disable-next-line consistent-return
     .then((card) => {
@@ -40,22 +44,22 @@ module.exports.deleteCard = (req, res) => {
           Card.findByIdAndRemove(req.params.id)
             .then(() => res.send({ message: 'Карточка удалена' }));
         } else {
-          res.status(403).send({ message: 'Удаление возможно только владельцем карточки' });
+          next(new ForbiddenError('Удаление возможно только владельцем карточки'));
         }
       } else {
-        res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` });
+        next(new NotFoundError(`Карточка c id: ${req.params.id} не найдена`));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Упс, что-то пошло не так!' });
+        next(new CastError('Переданы некорректные данные при удалении карточки'));
       } else {
-        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -65,19 +69,19 @@ module.exports.likeCard = (req, res) => {
       if (card) {
         res.send(card);
       } else {
-        res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` });
+        next(new NotFoundError(`Карточка c id: ${req.params.id} не найдена`));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Упс, что-то пошло не так!' });
+        next(new CastError('Упс, что-то пошло не так!'));
       } else {
-        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
@@ -87,14 +91,14 @@ module.exports.dislikeCard = (req, res) => {
       if (card) {
         res.send(card);
       } else {
-        res.status(404).send({ message: `Карточка с id: ${req.params.id} не найдена` });
+        next(new NotFoundError(`Карточка c id: ${req.params.id} не найдена`));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Упс, что-то пошло не так!' });
+        next(new CastError('Упс, что-то пошло не так!'));
       } else {
-        res.status(500).send({ message: 'Ошибка на стороне сервера' });
+        next(new ServerError('Ошибка на стороне сервера'));
       }
     });
 };
