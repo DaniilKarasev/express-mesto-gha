@@ -59,12 +59,12 @@ module.exports.createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            return next(new CastError(`Переданы некорректные данные при создании пользователя. Поле${err.message.replace('user validation failed:', '').replace(':', '')}`));
+            next(new CastError(`Переданы некорректные данные при создании пользователя. Поле${err.message.replace('user validation failed:', '').replace(':', '')}`));
           }
           if (err.code === 11000) {
-            return next(new ConflictError(`Пользователь с email '${err.keyValue.email}' уже зарегистрирован`));
+            next(new ConflictError(`Пользователь с email '${err.keyValue.email}' уже зарегистрирован`));
           }
-          return next(new ServerError('Произошла ошибка'));
+          next(new ServerError('Произошла ошибка'));
         });
     })
     .catch(() => {
@@ -147,14 +147,14 @@ module.exports.getCurrentUserInfo = (req, res, next) => {
   User.findById(req.user)
     .then((user) => {
       if (user) {
-        return res.send(user);
+        res.send(user);
       }
-      return next(new NotFoundError(`Пользователь по указанному c id: ${req.params.id} не найден`));
+      next(new NotFoundError(`Пользователь по указанному c id: ${req.params.id} не найден`));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new CastError('Передан некорректный id пользователя'));
+        next(new CastError('Передан некорректный id пользователя'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      next(new ServerError('Произошла ошибка'));
     });
 };

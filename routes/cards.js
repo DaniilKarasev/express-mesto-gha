@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi, Segments } = require('celebrate');
-const { linkValidationPattern, idValidationPattern } = require('../utils/validationRegex');
+const { linkValidation, idValidation } = require('../utils/validationRegex');
 
 const {
   getCards,
@@ -15,25 +15,25 @@ router.get('/', getCards);
 router.post('/', celebrate({
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().regex(linkValidationPattern),
+    link: Joi.string().required().regex(linkValidation),
   }),
 }), createCard);
 
 router.delete('/:id', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidationPattern),
+    id: Joi.string().regex(idValidation),
   }),
 }), deleteCard);
 
 router.put('/:id/likes', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidationPattern),
+    id: Joi.string().regex(idValidation),
   }),
 }), likeCard);
 
 router.delete('/:id/likes', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidationPattern),
+    id: Joi.string().regex(idValidation),
   }),
 }), dislikeCard);
 

@@ -1,6 +1,6 @@
 /* eslint-disable func-names */
 const mongoose = require('mongoose');
-const { linkValidationPattern } = require('../utils/validationRegex');
+const { linkValidation } = require('../utils/validationRegex');
 
 const cardSchema = mongoose.Schema({
   name: {
@@ -31,7 +31,7 @@ const cardSchema = mongoose.Schema({
 });
 
 const linkValidator = function (value) {
-  return linkValidationPattern.test(value);
+  linkValidation.test(value);
 };
 
 cardSchema.path('link').validate(linkValidator, 'error');

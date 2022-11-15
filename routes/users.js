@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi, Segments } = require('celebrate');
-const { linkValidationPattern, idValidationPattern } = require('../utils/validationRegex');
+const { linkValidation, idValidation } = require('../utils/validationRegex');
 
 const {
   getUsers,
@@ -23,13 +23,13 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   [Segments.BODY]: Joi.object().keys({
-    avatar: Joi.string().required().regex(linkValidationPattern),
+    avatar: Joi.string().required().regex(linkValidation),
   }),
 }), editUserAvatar);
 
 router.get('/:id', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidationPattern),
+    id: Joi.string().regex(idValidation),
   }),
 }), getUserById);
 
