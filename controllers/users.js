@@ -59,12 +59,12 @@ module.exports.createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            next(new CastError(`Переданы некорректные данные при создании пользователя. Поле${err.message.replace('user validation failed:', '').replace(':', '')}`));
+            return next(new CastError(`Переданы некорректные данные при создании пользователя. Поле${err.message.replace('user validation failed:', '').replace(':', '')}`));
           }
           if (err.code === 11000) {
-            next(new ConflictError(`Пользователь с email '${err.keyValue.email}' уже зарегистрирован`));
+            return next(new ConflictError(`Пользователь с email '${err.keyValue.email}' уже зарегистрирован`));
           }
-          next(new ServerError('Произошла ошибка'));
+          return next(new ServerError('Произошла ошибка'));
         });
     })
     .catch(() => {
@@ -115,10 +115,9 @@ module.exports.editUserAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new CastError(`Переданы некорректные данные при обновлении профиля. Поле${err.message.replace('Validation failed:', '').replace(':', '')}`));
-      } else {
-        next(new ServerError('Произошла ошибка'));
+        return next(new CastError(`Переданы некорректные данные при обновлении профиля. Поле${err.message.replace('Validation failed:', '').replace(':', '')}`));
       }
+      return next(new ServerError('Произошла ошибка'));
     });
 };
 
