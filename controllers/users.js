@@ -147,13 +147,14 @@ module.exports.getCurrentUserInfo = (req, res, next) => {
     .then((user) => {
       if (user) {
         res.send(user);
+      } else {
+        next(new NotFoundError(`Пользователь по указанному c id: ${req.params.id} не найден`));
       }
-      next(new NotFoundError(`Пользователь по указанному c id: ${req.params.id} не найден`));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new CastError('Передан некорректный id пользователя'));
+        return next(new CastError('Передан некорректный id пользователя'));
       }
-      next(new ServerError('Произошла ошибка'));
+      return next(new ServerError('Произошла ошибка'));
     });
 };
