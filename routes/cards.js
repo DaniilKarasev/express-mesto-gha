@@ -21,19 +21,19 @@ router.post('/', celebrate({
 
 router.delete('/:id', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidation),
+    id: Joi.string().required().regex(idValidation),
   }),
 }), deleteCard);
 
 router.put('/:id/likes', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidation),
+    id: Joi.string().required().regex(idValidation),
   }),
 }), likeCard);
 
 router.delete('/:id/likes', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidation),
+    id: Joi.string().required().regex(idValidation),
   }),
 }), dislikeCard);
 

@@ -29,7 +29,7 @@ router.patch('/me/avatar', celebrate({
 
 router.get('/:id', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().regex(idValidation),
+    id: Joi.string().required().regex(idValidation),
   }),
 }), getUserById);
 
